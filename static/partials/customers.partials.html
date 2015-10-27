@@ -1,0 +1,15 @@
+<h1>Customers Partial</h1>
+
+<form>
+	<input type="text" 
+		ng-model="customersCtrl.newCustomer.name">
+	<input type="submit" 
+		ng-click="customersCtrl.add(customersCtrl.newCustomer)">
+</form>
+
+<li ng-repeat="customer in customersCtrl.customers">
+	<span ng-bind="customer.name"></span>
+	- 
+	<span ng-bind="customer.created_at | date:'medium'"></span>
+	<button ng-click="customersCtrl.destroy(customer)">delete</button>
+</li>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html ng-app='myApp'>
+<head>
+	<meta charset="UTF-8">
+	<title>The Index Page</title>
+	<script type="text/javascript" src="lib/angular.js"></script>
+	<script type="text/javascript" src="lib/angular-routes.js"></script>
+	<script type="text/javascript">
+	var myAppObject = angular.module('myApp', ['ngRoute']);
+	myAppObject.config(function($routeProvider){
+		$routeProvider
+		.when('/', {
+			redirectTo: '/customers'
+		})
+		.when('/customers', {
+			templateUrl: 'partials/customers.partials.html',
+			controller: 'CustomersController',
+			controllerAs: 'customersCtrl'
+
+		})
+		.when('/orders', {
+			templateUrl: 'partials/orders.partials.html',
+			controller: 'OrdersController',
+			controllerAs: 'ordersCtrl'
+		})
+	})
+//THE FACTORY ----------------------
+	
+	myAppObject.factory('CustomerFactory', function(){
+		var customers = [
+{ name: 'Aaron Wise', created_at: 1445557036855 },
+{ name: 'Neil DeGrasse Tyson', created_at: 1445557036855 },
+{ name: 'Pat Sajac', created_at: 1445557036855 },
+{ name: 'Alex Trebek', created_at: 1445557036855 }
+		];
+		var factory = {
+			retrieveCustomers: function(callback){
+				callback(customers)
+			},
+			add: function(newCustomer, callback){
+				newCustomer.created_at = Date.now();
+				customers.push(newCustomer);
+				callback();
+			},
+			destroy: function(customer, callback){
+				 var index = customers.indexOf(customer);
+				 customers.splice(index, 1);
+				 callback();
+			}
+		}
+			return factory;
+	})
+
+
+//THE CONTROLLER ------------------
+	myAppObject.controller('CustomersController', function(CustomerFactory){
+			console.log("CustomersController Loaded!");
+			var _this = this;
+			function retrieveCustomers(){
+					CustomerFactory.retrieveCustomers(function(customers){
+				_this.customers = customers;
+				});
+			}
+			retrieveCustomers();
+		
+			this.add = function(newCustomer){
+				console.log('in controller add method', newCustomer);
+				CustomerFactory.add(newCustomer, function(){
+					retrieveCustomers();
+				});
+				_this.newCustomer = {};
+			}
+			this.destroy = function(customer){
+				CustomerFactory.destroy(customer, function(){
+					retrieveCustomers();
+
+				})
+			}
+	})
+
+	myAppObject.factory('ProductFactory', function(){
+		var products = ['Concrete Form A', 'Jack Hammer', 'Concrete vibrator', 'rake', 'Blast-wall'];
+		var factory = {
+			getAllProducts: function(callback){
+				callback(products);
+			}
+
+		}
+		return factory;
+	})
+
+	myAppObject.factory('OrderFactory', function(){
+		var orders = [];
+		var factory = {
+			add: function(newOrder, callback){
+				newOrder.created_at = Date.now();
+				orders.push(newOrder);
+				callback();
+			},
+			getAllOrders: function(callback){
+				callback(orders);
+			}
+		}
+		return factory;
+	})
+
+	myAppObject.controller('OrdersController', function(CustomerFactory,OrderFactory, ProductFactory){
+		var _this = this;
+		CustomerFactory.retrieveCustomers(function(customers){
+			_this.customers = customers;
+		})
+		ProductFactory.getAllProducts(function(products){
+			_this.products = products;
+		})
+		this.newOrder = {};
+
+		function retrieveAllOrders(){
+			OrderFactory.getAllOrders(function(orders){
+				_this.orders = orders;
+			})
+		}
+		retrieveAllOrders();
+
+		this.add = function(newOrder){
+			OrderFactory.add(newOrder, function(){
+				retrieveAllOrders();
+			})
+			console.log(newOrder);
+		}
+	})
+
+	</script>
+</head>
+<body>
+	<h2>Index Page</h2>
+	<a href="#/customers">Customers</a>
+	<a href="#/orders">Order</a>
+	<div ng-view></div>
+</body>
+</html>

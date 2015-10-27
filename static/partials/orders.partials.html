@@ -1,0 +1,37 @@
+<h2>Orders partials</h2>
+<form>
+
+	Customers:
+	<select 
+		ng-model="ordersCtrl.newOrder.name">
+		
+		<option ng-repeat="customer in ordersCtrl.customers track by $index">{{customer.name}}</option>
+	</select>
+
+	Qty:<input type="number" ng-model="ordersCtrl.newOrder.qty">
+	
+	Product: <select ng-model='ordersCtrl.newOrder.product'>
+		<option ng-repeat="product in ordersCtrl.products track by $index" ng-value="product">{{product}}</option>
+	</select>
+
+	<input type="submit" ng-click="ordersCtrl.add(ordersCtrl.newOrder)">
+</form>
+
+<table>
+	<thead>
+		<tr>
+			<th>Name</th>
+			<th>Product</th>
+			<th>Qty</th>
+			<th>Date</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="order in ordersCtrl.orders track by $index">
+			<td ng-bind='order.name'></td>
+			<td ng-bind='order.product'></td>
+			<td ng-bind='order.qty'></td>
+			<td ng-bind='order.created_at | date:"longDate"'></td>
+		</tr>
+	</tbody>
+</table>
